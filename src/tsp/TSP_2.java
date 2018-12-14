@@ -14,7 +14,6 @@ import java.util.*;
 public class TSP_2 {
 
 	/**
-	 * Probando patatas pasadas por el papa paposo que se papea la papilla del papa
 	 * Programa principal donde ejecutamos las implementaciones del problema. Determinamos el
 	 * tiempo de ejecución de los algoritmos de cada problema, almacenandolos en un array
 	 * para su posterior muestra.
