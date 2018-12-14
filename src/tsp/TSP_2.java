@@ -7,7 +7,7 @@ package tsp;
 
 /**
  *
- * @author Ander
+ * @author Mi polla morena
  */
 import java.io.BufferedReader;
 import java.io.FileReader;
