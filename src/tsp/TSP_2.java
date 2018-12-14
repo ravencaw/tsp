@@ -17,7 +17,7 @@ import java.util.*;
 public class TSP_2 {
 
     /**
-     * @param args the command line arguments
+     * Tooooonto
      */
     public static void main(String[] args) throws Exception {
         System.out.println("\nEXPERIMENTO DEL TSP\n\n");
