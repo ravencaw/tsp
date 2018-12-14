@@ -5,10 +5,7 @@
  */
 package tsp;
 
-/**
- *
- * @author Mi polla morena
- */
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -16,9 +13,6 @@ import java.util.*;
 
 public class TSP_2 {
 
-    /**
-     * Tooooonto
-     */
     public static void main(String[] args) throws Exception {
         System.out.println("\nEXPERIMENTO DEL TSP\n\n");
         int iteraciones = 100;
@@ -28,7 +22,7 @@ public class TSP_2 {
 
         double[][] duraciones = new double[instancias.length][3];
 
-        for (int i = 0; i < instancias.length; i++) {
+        for (int i = 0; i < instancias.length-3; i++) {
             System.out.println("\n\n--------------------------------------------");
             System.out.println("Instancia " + (i + 1));
             double[][] dist = leerFichero("data\\" + instancias[i]);
@@ -39,7 +33,7 @@ public class TSP_2 {
             System.out.println("Ejecutando Bactracking");
             double start = System.currentTimeMillis();
             for (int j = 0; j < repeticiones; j++) {
-                //Backtracking(dist, nciudades);
+                Backtracking(dist, nciudades);
             }
             double stop = System.currentTimeMillis();
             duraciones[i][0] = (stop - start) / repeticiones;
