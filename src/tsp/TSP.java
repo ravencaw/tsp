@@ -5,7 +5,7 @@ import java.util.*;
 
 
 public class TSP {
-	
+	//Version ultima 
 	public static int[] generaPrimera(int numCiudades) {
         int[] sol = new int[numCiudades];
         for (int i = 0; i < numCiudades; i++) {
