@@ -13,10 +13,23 @@ import java.util.*;
 
 public class TSP_2 {
 
+	/**
+	 * Programa principal donde ejecutamos las implementaciones del problema. Determinamos el
+	 * tiempo de ejecución de los algoritmos de cada problema, almacenandolos en un array
+	 * para su posterior muestra.
+	 * 
+	 * 1- BackTracking 
+	 * 2- Busqueda Local
+	 * 3- Divide y Vencerás
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
     public static void main(String[] args) throws Exception {
         System.out.println("\nEXPERIMENTO DEL TSP\n\n");
         int iteraciones = 100;
         Random rnd = new Random();
+        //Instancias del problema en los archivos tsp
         String[] instancias = {"a280.tsp", "berlin52.tsp", "kroA100.tsp", "kroA150.tsp", "kroA200.tsp",
             "usa13509.tsp", "vm1084.tsp", "vm1748.tsp"};
 
@@ -30,14 +43,16 @@ public class TSP_2 {
             int[] s1 = new int[nciudades];
             int repeticiones = 500;
 
+            //Backtraking
             System.out.println("Ejecutando Bactracking");
             double start = System.currentTimeMillis();
             for (int j = 0; j < repeticiones; j++) {
-                Backtracking(dist, nciudades);
+//                Backtracking(dist, nciudades);
             }
             double stop = System.currentTimeMillis();
             duraciones[i][0] = (stop - start) / repeticiones;
 
+            //Busqueda local
             System.out.println("Ejecutando Búsqueda Local");
             start = System.currentTimeMillis();
             for (int j = 0; j < repeticiones; j++) {
@@ -46,11 +61,13 @@ public class TSP_2 {
             stop = System.currentTimeMillis();
             duraciones[i][1] = (stop - start) / repeticiones;
 
+            //Divide y Vencerás
             System.out.println("Ejecutando Divide y Vencerás");
             start = System.currentTimeMillis();
             for (int j = 0; j < repeticiones; j++) {
                 solve(dist, 0);
             }
+            
             stop = System.currentTimeMillis();
             duraciones[i][2] = (stop - start) / repeticiones;
             System.out.println("--------------------------------------------");
@@ -66,6 +83,12 @@ public class TSP_2 {
         }
     }
 
+    /**
+     * Códico del algoritmo de Backtracking
+     * @param dist
+     * @param nciudades
+     * @throws Exception
+     */
     public static void Backtracking(double[][] dist, int nciudades) throws Exception {
 
         int[] solucion = creaMatriz(nciudades);
@@ -80,6 +103,70 @@ public class TSP_2 {
         System.out.println(" Distancia --------> " + evaluate(solucion, dist));
     }
 
+    /**Divide y venceras
+     * 
+     * @param entrada
+     * @return
+     */
+    public static double[][] divideYVenceras(double[][] entrada) {
+        double[][][] subS = new double[2][][], subP;
+        double[][] s;
+        if (entrada.length == 1) {
+            s = entrada;
+        } else {
+            subP = divide(entrada);
+            for (int i = 0; i < 2; i++) {
+                subS[i] = divideYVenceras(subP[i]);
+            }
+            s = combina(subS, entrada.length);
+        }
+        return s;
+    }
+
+    /**
+     * Busqueda local en Java
+     * @param vecindad
+     * @param num_ciudades
+     * @param seed
+     * @param dist
+     * @param solucion
+     * @return
+     */
+    public static int[] TSPLocalSearch(int vecindad, int num_ciudades, int seed, double[][] dist, int[] solucion) { //Algoritmo que se encargara de buscar la mejor solucion posible
+
+        boolean fallo = false;
+        int[] auxiliar = creaMatriz(num_ciudades);  //para evitar los fallos de punteros al trabajar con la solucion
+        System.arraycopy(solucion, 0, auxiliar, 0, solucion.length);
+
+        while (!fallo && vecindad >= 0) {   //mientras no haya fallo y la vecindad sea mayor o igual a 0 (para la recursividad)
+            auxiliar = cambioCiudades(auxiliar, num_ciudades, seed);
+            if (evaluate(auxiliar, dist) < evaluate(solucion, dist)) {
+                for (int j = 0; j < num_ciudades; j++) { //Para copiar un array a otro
+                    solucion[j] = auxiliar[j];
+                }
+                System.arraycopy(TSPLocalSearch(vecindad - 1, num_ciudades, seed, dist, solucion), 0, solucion, 0, solucion.length);    //copiamos la solucion al meternos recursivamente
+            } else {
+                Random dado = new Random();
+                int tirada = dado.nextInt(100);
+
+                if (tirada < 50) {  //si la tirada
+                    System.arraycopy(TSPLocalSearch(vecindad - 1, num_ciudades, seed, dist, solucion), 0, auxiliar, 0, auxiliar.length);
+
+                    if (evaluate(auxiliar, dist) < evaluate(solucion, dist)) {
+                        for (int j = 0; j < num_ciudades; j++) { //Para copiar un array a otro
+                            solucion[j] = auxiliar[j];
+                        }
+                    }
+                } else {    //Salimos del nivel de recursividad si falla la tirada
+                    fallo = true;
+                }
+            }
+            vecindad--;
+        }
+        return solucion;
+    }
+    
+    
     static void swap(int[] arr, int x, int y) {
         int temp = arr[x];
         arr[x] = arr[y];
@@ -115,41 +202,13 @@ public class TSP_2 {
         }
     }
 
-    //Búsqueda local
-    public static int[] TSPLocalSearch(int vecindad, int num_ciudades, int seed, double[][] dist, int[] solucion) { //Algoritmo que se encargara de buscar la mejor solucion posible
-
-        boolean fallo = false;
-        int[] auxiliar = creaMatriz(num_ciudades);  //para evitar los fallos de punteros al trabajar con la solucion
-        System.arraycopy(solucion, 0, auxiliar, 0, solucion.length);
-
-        while (!fallo && vecindad >= 0) {   //mientras no haya fallo y la vecindad sea mayor o igual a 0 (para la recursividad)
-            auxiliar = cambioCiudades(auxiliar, num_ciudades, seed);
-            if (evaluate(auxiliar, dist) < evaluate(solucion, dist)) {
-                for (int j = 0; j < num_ciudades; j++) { //Para copiar un array a otro
-                    solucion[j] = auxiliar[j];
-                }
-                System.arraycopy(TSPLocalSearch(vecindad - 1, num_ciudades, seed, dist, solucion), 0, solucion, 0, solucion.length);    //copiamos la solucion al meternos recursivamente
-            } else {
-                Random dado = new Random();
-                int tirada = dado.nextInt(100);
-
-                if (tirada < 50) {  //si la tirada
-                    System.arraycopy(TSPLocalSearch(vecindad - 1, num_ciudades, seed, dist, solucion), 0, auxiliar, 0, auxiliar.length);
-
-                    if (evaluate(auxiliar, dist) < evaluate(solucion, dist)) {
-                        for (int j = 0; j < num_ciudades; j++) { //Para copiar un array a otro
-                            solucion[j] = auxiliar[j];
-                        }
-                    }
-                } else {    //Salimos del nivel de recursividad si falla la tirada
-                    fallo = true;
-                }
-            }
-            vecindad--;
-        }
-        return solucion;
-    }
-
+    
+    /**
+     * Algoritmo Voráz
+     * @param distances
+     * @param initialPosition
+     * @return
+     */
     public static int[] GreedyAlgorithm(double[][] distances, int initialPosition) {//es la solucion
         //Genera un array solución para introducir los datos de nuestra solucion
         int[] route = new int[distances.length];
@@ -181,8 +240,14 @@ public class TSP_2 {
         }
         return route;
     }
+    
 
-    //Divide y vencerás
+    /**
+     * 
+     * @param distances
+     * @param initialPosition
+     * @return
+     */
     public static int[] solve(double[][] distances, int initialPosition) {
         int[] route = new int[distances.length];
         int numCities = distances.length;
@@ -231,21 +296,7 @@ public class TSP_2 {
         return nc;
     }
 
-    public static double[][] divideYVenceras(double[][] entrada) {
-        double[][][] subS = new double[2][][], subP;
-        double[][] s;
-        if (entrada.length == 1) {
-            s = entrada;
-        } else {
-            subP = divide(entrada);
-            for (int i = 0; i < 2; i++) {
-                subS[i] = divideYVenceras(subP[i]);
-            }
-            s = combina(subS, entrada.length);
-        }
-        return s;
-    }
-
+    
     //Funciones auxiliares
     public static double[][][] divide(double[][] entrada) {
         double[][][] s = new double[2][entrada.length / 2][2];
@@ -391,6 +442,12 @@ public class TSP_2 {
     }
     
 
+    /**Método de lectura de ficheros TSP que devuelve la matriz de distancias
+     * del archivo TSP correspondiente.
+     * 
+     * @param FILENAME nombre del archivo
+     * @return 
+     */
     private static double[][] leerFichero(String FILENAME) {
         double[][] dist = null;
         double[][] ciudades = null;
