@@ -42,7 +42,6 @@ public class TSP_2 {
             int nciudades = dist.length;
             int[] s1 = new int[nciudades];
             int repeticiones = 500;
-
             
             //Backtraking 2
             System.out.println("Ejecutando Bactracking");
