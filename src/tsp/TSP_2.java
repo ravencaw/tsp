@@ -43,7 +43,7 @@ public class TSP_2 {
             int[] s1 = new int[nciudades];
             int repeticiones = 500;
             
-            //Backtraking 2
+            //Backtraking
             System.out.println("Ejecutando Bactracking");
             double start = System.currentTimeMillis();
             for (int j = 0; j < repeticiones; j++) {
