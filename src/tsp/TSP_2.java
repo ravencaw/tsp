@@ -40,7 +40,7 @@ public class TSP_2 {
             System.out.println("Instancia " + (i + 1));
             double[][] dist = leerFichero("data\\" + instancias[i]);
             int nciudades = dist.length;
-            int[] s1 = new int[nciudades];
+            int[] s1 = new int[nciudades]
             int repeticiones = 500;
 
             //Backtraking
