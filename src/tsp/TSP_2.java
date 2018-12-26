@@ -28,8 +28,8 @@ public class TSP_2 {
 		Random rnd = new Random();
 		// Instancias del problema en los archivos tsp
 		String[] instancias = { "berlin52.tsp",
-				// "a280.tsp","kroA100.tsp", "kroA150.tsp", "kroA200.tsp",
-				// "vm1084.tsp", "vm1748.tsp" , "usa13509.tsp"
+				 "a280.tsp","kroA100.tsp", "kroA150.tsp", "kroA200.tsp",
+				 "vm1084.tsp", "vm1748.tsp" , "usa13509.tsp"
 		};
 
 		double[][] duraciones = new double[instancias.length][3];
@@ -58,15 +58,13 @@ public class TSP_2 {
 					// + "Búsqueda Local"
 					+ "Algoritmo Voraz");
 			start = System.currentTimeMillis();
-			for (int j = 0; j < repeticiones; j++) {
-				p =
-						// TSPLocalSearch(3, nciudades, 1432, dist,
-						GreedyAlgorithm(dist, 4)
-				// )
-				;
-			}
+			// for (int j = 0; j < repeticiones; j++) {
+			p = TSPLocalSearch(3, nciudades, 1432, dist, GreedyAlgorithm(dist, 9));
+			// }
 			stop = System.currentTimeMillis();
-			duraciones[i][1] = (stop - start) / repeticiones;
+			duraciones[i][1] = (stop - start)
+			/// repeticiones
+			;
 
 			// //Divide y Vencerás
 			// System.out.println("Ejecutando Divide y Vencerás");
@@ -256,66 +254,66 @@ public class TSP_2 {
 	 */
 	public static int[] GreedyAlgorithm(double[][] distances, int initialCity) throws Exception {// es la solucion
 		// Genera un array solución para introducir los datos de nuestra solucion
-		int[] route = new int[distances.length];
+		int[] route = new int[distances[0].length];
 		// Numero de ciudades del problema
-		int numCities = distances.length;
+		int numCities = distances[0].length;
 
 		// Indica por cual ciudad vamos a empezar
 		int current = initialCity;
 
 		int cont = 0;
-		Stack<Integer> seleccionados = new Stack<Integer>();
-		// int[] cities = new int[numCities];
-		// Comprueba en la matriz de soluciones cuales son las mejores posiciones a las
-		// que ir
-		do {
 
-			// if (current >= numCities) {
-			// current =0;
-			// for(int i=0;i<numCities;i++) {
-			// if(route[current]==0) {
-			// current=current+1;
-			// }
-			// }
-			// }
-			route[cont] = TSP_2.closestWay(distances, seleccionados, current, numCities);
-			//
-			// current++
-			current=route[cont];
+		// int[] citiesVisited = new int[numCities];
+
+		route[cont] = current;
+		// Comprueba en la nmatriz de soluciones cuales son las mejores posiciones a las
+		// que ir
+		while (cont < numCities) {
+
+			// El método clo
+			int next = TSP_2.closestWay(distances, route, cont, current);
+
+
+			route[cont] = next;
+			current = next;
 			cont++;
 
-		} while (cont < numCities);
-
-		for (int k = 0; k < route.length; k++) {
-			System.out.println(route[k]);
 		}
+
+//		for (int k = 0; k < route.length; k++) {
+//			System.out.println(route[k] + " ");
+//		}
 		return route;
 	}
-
-	public static int closestWay(double[][] distances, Stack<Integer> forbidden, int position, int ciudades)
-			throws Exception {
-
-		int res = 0;
-		double pos = 0;
-
-		double menor = Double.MAX_VALUE;
-		for (int i = 0; i < ciudades; i++) {
-			pos = distances[position][i];
-			forbidden.push(i);
-			if (!yaEscogida(forbidden, ciudades, position) && pos != 0 && pos < menor) {
-				menor = pos;
-				forbidden.push(i);
-				res = i;
-			} else {
-
-				forbidden.pop();
+	/**
+	 * Método que verifica el camino más corto
+	 * @param distances
+	 * @param route
+	 * @param cont
+	 * @param current
+	 * @return la ciudad mas cercana aun no registrada
+	 * @throws Exception
+	 */
+	private static int closestWay(double[][] distances, int[] route, int cont, int current) throws Exception {
+		
+		double position=0;
+		double menor= Double.MAX_VALUE;
+		int res=0;
+		for (int i = 0; i < route.length; i++) {
+			position=distances[cont][i];
+			
+			if(position<menor && position!=0) {
+				if(!yaEscogida(route,route.length,i)) {
+					menor=position;
+					res=i;
+					
+				}
 			}
-
+			
 		}
-
 		return res;
-
 	}
+
 
 	/**
 	 * Verifica si la ciudad se encuentra dentro de las escogidas previamente
@@ -326,54 +324,22 @@ public class TSP_2 {
 	 * @return
 	 * @throws Exception
 	 */
-	public static boolean yaEscogida(Stack<Integer> x, int numCities, int ciudad) throws Exception {
-		
+	public static boolean yaEscogida(int[] x, int numCities, int ciudad) throws Exception {
+
 		boolean escogido = false;
 
-		Iterator it = x.iterator();
+		int i = 0;
 
 		int actual = 0;
-		while (it.hasNext()) {
-			actual = (int) it.next();
+		while (i < numCities) {
+			actual = x[i];
 			if (actual == ciudad) {
 				escogido = true;
 			}
-
+			i++;
 		}
-
 		return escogido;
 	}
-
-	public static int bestWay(double[][] b, Stack<Integer> x, int i) throws Exception {
-		double min;
-		int mejorTarea = -1;
-		int position = 0;
-		min = Double.MAX_VALUE;
-
-		int noNulos = 0;
-		// for(int l=0; l<x.length;l++) {
-		// if(x[l]==0) {
-		// noNulos++;
-		// }
-		// }
-
-		// Nos aseguramos de que no vamos a tomar la direccion a si misma
-		for (int tarea = 0; tarea < b.length; tarea++) {
-
-			x.push(tarea);
-			if (!TSP_2.yaEscogida(x, i, tarea) && b[i][tarea] < min && b[i][tarea] != 0) {
-				min = b[i][tarea];
-				mejorTarea = tarea;
-
-				// x[position]=min;
-				// position++;
-			} else {
-				x.pop();
-			}
-		}
-		return mejorTarea;
-	}
-
 	/**
 	 * 
 	 * @param distances
@@ -480,27 +446,6 @@ public class TSP_2 {
 			}
 		}
 		return w;
-	}
-
-	private static int nextCity(int[] cavailable, int current, double[][] distances) {
-		int nc = -1;
-		double path = Double.MAX_VALUE;
-
-		for (int i = 0; i < cavailable.length; i++) {
-			if (i < current) {
-				if (cavailable[i] == 0 && distances[i][current - i] < path) {
-					nc = i;
-					path = distances[i][current - i];
-				}
-			} else if (i >= current) {
-				if (cavailable[i] == 0 && distances[current][i - current] < path) {
-					nc = i;
-					path = distances[current][i - current];
-				}
-			}
-		}
-		cavailable[nc] = 1;
-		return nc;
 	}
 
 	public static int[] rellenarAuxiliar(int j, int[] arr) {
