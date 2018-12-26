@@ -40,7 +40,7 @@ public class TSP_2 {
             System.out.println("Instancia " + (i + 1));
             double[][] dist = leerFichero("data\\" + instancias[i]);
             int nciudades = dist.length;
-            int[] s1 = new int[nciudades]
+            int[] s1 = new int[nciudades];
             int repeticiones = 500;
 
             //Backtraking
@@ -89,19 +89,115 @@ public class TSP_2 {
      * @param nciudades
      * @throws Exception
      */
-    public static void Backtracking(double[][] dist, int nciudades) throws Exception {
+//    public static void Backtracking(double[][] dist, int nciudades) throws Exception {
+//
+//        int[] solucion = creaMatriz(nciudades);
+//        int[] recorrido = creaMatriz(nciudades);
+//
+//        permute(recorrido, dist, solucion);
+//
+//        System.out.print("\nMejor solucion:");
+//        for (int i = 0; i < nciudades; i++) {
+//            System.out.print(" " + solucion[i]);
+//        }
+//        System.out.println(" Distancia --------> " + evaluate(solucion, dist));
+//    }
+    private static int position = 1;
+    
+    public static void backtracking(double[][] dist, int nciudades){
+		Stack<Double> stack = new Stack<Double>();
+		List<Double> forbidden = new ArrayList<Double>();
+		boolean exit = false;
+		int cont = 0, pos = 0;
 
-        int[] solucion = creaMatriz(nciudades);
-        int[] recorrido = creaMatriz(nciudades);
+		while (cont < nciudades) {
 
-        permute(recorrido, dist, solucion);
+			for (int i = 0; i < dist.length && !exit; i++) {
+				if (pos != i) {
+					// Anotamos la posible solucion de la fila indicada
+					stack.push(dist[pos][i]);
 
-        System.out.print("\nMejor solucion:");
-        for (int i = 0; i < nciudades; i++) {
-            System.out.print(" " + solucion[i]);
-        }
-        System.out.println(" Distancia --------> " + evaluate(solucion, dist));
-    }
+					boolean cmp = forbidden.contains(dist[pos][i]);
+					// Evaluamos la posible solucion de forma que si el metodo "evaluate" no
+					// devuelve un true la solucion se desapila y se introduce en la lista de
+					// "forbidden" para evitar tomarla de nuevo
+					if ((i + 1) < dist.length) {
+						if (!cmp && !evaluate(dist[pos][i], dist[pos][i + 1], stack)) {
+							if (!cmp) {
+								forbidden.add(dist[pos][i]);
+							}
+							stack.pop();
+						} else {
+							exit = true;
+							pos = i;
+						}
+					}
+
+				}
+			}
+
+			exit = false;
+			cont++;
+		}
+
+		// Realizamos permutaciones en la matriz de distancias para intercambiar las
+		// ciudades y obtener nuevas soluciones
+		double change[][] = permuteBack(dist);
+
+		// Si el metodo que realiza las permutaciones devuelve una matriz nula no
+		// continuaremos buscando soluciones, en caso contrario probaremos a encontrar
+		// una solucion dentro de la nueva matriz
+		if (change != null) {
+			backtracking(change, nciudades);
+		} else {
+			position = 1;
+		}
+	}
+
+	private static double[][] permuteBack(double[][] dist) {
+		// Este metodo realiza permutaciones en las ciudades para obtener diferentes
+		// soluciones mediante backtracking, para ello intercambia las ciudades extremo
+		// hasta que
+		// se encuentran en la posicion central del array cuando esto sucede se devuelve
+		// un valor nulo que indica que ya no se haran mas permutaciones
+
+		int posX = (dist.length - 1) - (dist.length - position);
+		int posY = dist.length - position;
+
+		if (posX == posY - 1) {
+			return null;
+		} else {
+			double[] aux = new double[dist.length];
+
+			for (int i = 0; i < dist.length; i++) {
+				aux[i] = dist[posX][i];
+			}
+
+			for (int i = 0; i < dist.length; i++) {
+				dist[posX][i] = dist[posY][i];
+			}
+
+			for (int i = 0; i < aux.length; i++) {
+				dist[posY][i] = aux[i];
+			}
+			position++;
+			return dist;
+		}
+
+	}
+
+	private static boolean evaluate(double n1, double n2, Stack s) {
+		// Este metodo realiza una evaluacion de la solucion de forma que devolvera un
+		// valor true si la solucion actual es menor que la siguiente (siempre que
+		// exista una siguiente), en caso
+		// contrario devolvera false
+
+		if (n1 < n2 && !s.contains(n1)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
     /**Divide y venceras
      * 
